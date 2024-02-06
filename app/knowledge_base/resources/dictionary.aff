@@ -1,0 +1,58 @@
+
+
+PFX P2 0 gag gab 
+PFX P2 Y 1 
+PFX P3 u hin deem
+PFX P3 Y 1 
+REP a aa 
+REP aa a 
+REP bt bd 
+REP c ch 
+REP ch c 
+REP ct cc 
+REP d dh 
+REP dh d
+REP dhn n 
+REP dhs ch 
+REP dht t 
+REP ds ch 
+REP dt dd 
+REP e ee 
+REP ee e 
+REP f ph 
+REP gt gd 
+REP i ii 
+REP ii i 
+REP jt jj 
+REP ln ll
+REP ls ch 
+REP n ny 
+REP ny n 
+REP o oo 
+REP oo o 
+REP ph f 
+REP rn rr 
+REP sn fn
+REP st ft 
+REP tdh dh 
+REP tn nn 
+REP u uu 
+REP uu u 
+REP xs cc 
+REP xt XX 
+SFX N1 0 iin n
+SFX N1 Y 1
+SFX N2 Y 12 
+SFX N2 a i eecha 
+SFX N2 a i eessa 
+SFX N2 a i eettii 
+SFX N2 a i eeysa 
+SFX N2 a i eeytii 
+SFX N2 a i essa
+SFX N2 eecha eeyyii eecha 
+SFX N2 eenii eeyyii eettii 
+SFX N2 eessa eeyyii eessa 
+SFX N2 eeysa eeyyii eeysa 
+SFX N2 eeytii eeyyii eeytii 
+SFX N2 essa eeyyii essa 
+

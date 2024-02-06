@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Afaan Oromoo Spell Checker App</title>
+</head>
+<body>
+    <div id="header-container">
+        <div id="avatar">
+            <img src="{{ url_for('static', filename='oda.jpg') }}" alt="Oda Oromo Icon">
+        </div>
+        <h1>Afaan Oromoo Spell Checker App</h1>
+    </div>
+
+    <div id="inputContainer">
+        <div id="inputText" contenteditable="true" oninput="handleInput(event)" onpaste="handlePaste(event)" ondrop="handleDrop(event)"></div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>
