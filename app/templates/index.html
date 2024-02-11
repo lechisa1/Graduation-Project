@@ -3,20 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Afaan Oromoo Spell Checker App</title>
+    
+
+    <title>Sirreessaa Qubeeffama Afaan Oromoo</title>
 </head>
 <body>
     <div id="header-container">
         <div id="avatar">
             <img src="{{ url_for('static', filename='oda.jpg') }}" alt="Oda Oromo Icon">
         </div>
-        <h1>Afaan Oromoo Spell Checker App</h1>
+        <h1>Sirreessaa Qubeeffama Afaan Oromoo</h1>
     </div>
 
     <div id="inputContainer">
         <div id="inputText" contenteditable="true" oninput="handleInput(event)" onpaste="handlePaste(event)" ondrop="handleDrop(event)"></div>
+    </div>
 
+    <!-- Suggestions container -->
+    <div id="suggestions">
+        <ul></ul>
+        <div id="suggestion-actions">
+            <i class="bi bi-slash-circle"></i>
+            
+            <i class="bi bi-file-earmark-plus"></i>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>

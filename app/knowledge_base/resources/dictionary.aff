@@ -1,9 +1,10 @@
 
-
-PFX P2 0 gag gab 
 PFX P2 Y 1 
-PFX P3 u hin deem
+PFX P2 0 gag gab 
+
 PFX P3 Y 1 
+PFX P3 u hin deem
+
 REP a aa 
 REP aa a 
 REP bt bd 
@@ -39,9 +40,10 @@ REP tn nn
 REP u uu 
 REP uu u 
 REP xs cc 
-REP xt XX 
-SFX N1 0 iin n
+REP xt xx 
 SFX N1 Y 1
+SFX N1 0 iin n
+
 SFX N2 Y 12 
 SFX N2 a i eecha 
 SFX N2 a i eessa 

@@ -1,37 +1,36 @@
-# error_correction.py
-
 import re
 import Levenshtein
 from app.knowledge_base.knowledge_base import KnowledgeBase
 from app.morphological_analyzer.morphological_analyzer import MorphologicalAnalyzer
 
 class ErrorCorrection:
-    def __init__(self, knowledge_base: KnowledgeBase, morphological_analyzer: MorphologicalAnalyzer):
+    def __init__(self, knowledge_base: KnowledgeBase, morphological_analyzer: MorphologicalAnalyzer, aff_file_path):
         self.knowledge_base = knowledge_base
         self.morphological_analyzer = morphological_analyzer
-        self.replacement_rules = {
-            'ph': 'f', 'f': 'ph', 'dh': 'd', 'd': 'dh', 'ch': 'c', 'c': 'ch', 'ny': 'n', 'n': 'ny',
-            'a': 'aa', 'aa': 'a', 'e': 'ee', 'ee': 'e', 'i': 'ii', 'ii': 'i', 'o': 'oo', 'oo': 'o',
-            'u': 'uu', 'uu': 'u', 'ds': 'ch', 'dhs': 'ch', 'dhn': 'n', 'tn': 'nn', 'xs': 'cc', 'tdh': 'dh',
-            'dht': 't', 'ls': 'ch', 'bt': 'bd', 'st': 'ft', 'dt': 'dd', 'ln': 'll', 'gt': 'gd', 'xt': 'XX',
-            'ct': 'cc', 'jt': 'jj', 'rn': 'rr', 'sn': 'fn'
-        }
+        self.replacement_rules = self.load_replacement_rules(aff_file_path)
+
+    def load_replacement_rules(self, aff_file_path):
+        replacement_rules = {}
+        with open(aff_file_path, 'r') as f:
+            for line in f:
+                if line.startswith('REP'):
+                    _, rule, replacement = line.strip().split()
+                    replacement_rules[rule] = replacement
+        return replacement_rules
 
     def apply_replacement_rules(self, error):
         for rule, replacement in self.replacement_rules.items():
             error = re.sub(r'\b' + re.escape(rule) + r'\b', replacement, error)
-            
         return error
 
     def correct_error(self, error):
         # Apply the replacement rules to the error
         corrected_error = self.apply_replacement_rules(error)
-
+        print(f"corrected_error:{corrected_error}")
        
 
         # Get all valid words from the knowledge base
         valid_words = self.knowledge_base.words.keys()
-
         
 
         # Find the valid words that have the minimum Levenshtein distance
@@ -49,23 +48,23 @@ class ErrorCorrection:
         print(f"Closest Words: {closest_words}")
 
         # Analyze the morphemes of the corrected error
-        roots, affixes = self.morphological_analyzer.analyze(corrected_error)
-
-       
+        valid_roots, valid_affixes = self.morphological_analyzer.analyze(corrected_error)
+        print(f"roots from EC: {valid_roots}")
+        print(f"affixes from EC: {valid_affixes}")
 
         # Check if roots are valid and affixes are not, return valid roots
-        if roots and not affixes:
-            return roots
+        if valid_roots and not valid_affixes:
+            return valid_roots
 
         # Check if affixes are valid and roots are not, return valid affixes
-        elif not roots and affixes:
-            return affixes
+        elif not valid_roots and valid_affixes:
+            return valid_affixes
 
         # If both roots and affixes are valid, you may want to decide which one to prioritize
 
         # For now, returning an empty list if both roots and affixes are valid
         else:
-            return []
+            return closest_words
 
     def weighted_levenshtein(self, s1, s2):
         # You can customize your own weights for insertion, deletion, and substitution here

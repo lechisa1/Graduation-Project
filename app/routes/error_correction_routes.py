@@ -12,14 +12,12 @@ def correct_errors():
     print(f"Errors from error detection: {errors}")
     kb = KnowledgeBase('app/knowledge_base/resources/dictionary.dic', 'app/knowledge_base/resources/dictionary.aff')
     ma = MorphologicalAnalyzer(kb)
-    error_correction = ErrorCorrection(kb, ma)
-   
+    error_correction = ErrorCorrection(kb, ma, 'app/knowledge_base/resources/dictionary.aff')  # Pass the .aff file path to ErrorCorrection
 
     corrections = []
     for error in errors:
         correction = error_correction.correct_error(error) 
-        #
+        print(f"correction from error correction routes: {correction}")
         corrections.append(correction)
-        print(f"Corrections word: {corrections}")
 
     return jsonify({'corrections': corrections})

@@ -1,5 +1,6 @@
 class KnowledgeBase:
     def __init__(self, dictionary_file_path, affix_file_path):
+        # print("Initializing KnowledgeBase...")
         self.dictionary_file_path = dictionary_file_path
         self.affix_file_path = affix_file_path
         self.words = {}
@@ -9,15 +10,7 @@ class KnowledgeBase:
         self.load_knowledge_base()
 
     def load_knowledge_base(self):
-        with open(self.dictionary_file_path, 'r') as f:
-            for line in f:
-                if '/' in line:
-                    word, affix_classes = line.strip().split('/')
-                    self.words[word] = affix_classes.split(',')
-                else:
-                    word = line.strip()
-                    self.words[word] = []
-
+        print("Loading knowledge base...")
         with open(self.affix_file_path, 'r') as f:
             for line in f:
                 values = line.strip().split()
@@ -30,20 +23,40 @@ class KnowledgeBase:
                         'affix': affix,
                         'condition': condition
                     }
-                    print(f"self.affixes: {self.affixes.items()}")
-                    
+                    print(f"Loaded affix: {flag} with details: {self.affixes[flag]}")
+                    print(f"General affixes: {self.affixes}")
 
-    def is_valid_word(self, word):
-        return word in self.words or word in self.custom_dictionary
+        with open(self.dictionary_file_path, 'r') as f:
+            for line in f:
+                if '/' in line:
+                    rootWord, affix_classes = line.strip().split('/')
+                    self.words[rootWord] = [self.affixes[affix]['affix'] for affix in affix_classes.split(',') if affix in self.affixes]
+                    print(f"Loaded word: {rootWord} with affixes: {self.words[rootWord]}")
+                    print(f"General words: {self.words}")
+                else:
+                    rootWord = line.strip()
+                    self.words[rootWord] = {}
+
+    def is_valid_word(self, rootWord):
+        print(f"Checking if {rootWord} is a valid word...")
+        return rootWord in self.words or rootWord in self.custom_dictionary
     
     def add_to_custom_dictionary(self, word):
+        print(f"Adding {word} to custom dictionary...")
         self.custom_dictionary.add(word)
 
     def ignore_word(self, word):
+        print(f"Ignoring word {word}...")
         self.ignored_words.add(word)
 
+    def get_affixes_for_root(self, rootWord):
+        print(f"Getting affixes for root word {rootWord}...")
+        return self.words.get(rootWord, [])
+
     def morphological_analysis(self, word):
+        print(f"Performing morphological analysis for word {word}...")
         if word in self.ignored_words:
+            print(f"Word {word} is in ignored words list.")
             return [word], []  # If the word is ignored, it's considered valid
 
         roots = []
@@ -51,61 +64,41 @@ class KnowledgeBase:
 
         # Scan input word from right to left to look for valid suffix
         for affix, rule in self.affixes.items():
-            
-            if word.endswith(rule['affix']):
-               
-                if rule['stripping'] != '0':
-                    
-                    root = word[:len(word) - len(rule['affix'])]+rule['stripping']
-                   
-                    
-                    
+            if word.endswith(rule['affix']) :
+                if rule['stripping'] != '0'  :
+                    stripped_letter = rule['stripping']
+                    print(f"stripped letter: {stripped_letter}")
+                    root = word[:len(word) - len(rule['affix'])]+stripped_letter
+                    roots.append(root)
+                    affixes.append(rule['affix'])
+                    print(f"Found valid suffix {rule['affix']} for word {word}, root is {root}")
                 else:
-                    
                     root = word[:len(word) - len(rule['affix'])]
                 roots.append(root)
-                affixes.append(affix)
-                print(f"affixes:{affixes}")
-                print(f"affixofwater:{affix}")
-                print(roots)
-                print(affixes)
+                affixes.append(rule['affix'])
+                print(f"Found valid suffix {rule['affix']} for word {word}, root is {root}")
             
-                
-                
-                 
-                
         # Scan input word from left to right to look for valid prefixes
         for affix, rule in self.affixes.items():
             if word.startswith(rule['affix']):
                 if rule['stripping'] != '0':
                     stripped_letter = rule['stripping']
+                    print(f"stripped letter: {stripped_letter}")
                     root = word[len(rule['affix']):] + stripped_letter
                 else:
                     root = word[len(rule['affix']):]
                 roots.append(root)
-                affixes.append(affix)
+                affixes.append(rule['affix'])
+                print(f"Found valid prefix {rule['affix']} for word {word}, root is {root}")
 
         valid_roots = []
         valid_affixes = []
 
         # Check if the roots are valid words and if they can take the affixes
-        for root in roots:
-            if self.is_valid_word(root) and all(affix in self.get_affixes_for_root(root) for affix in affixes):
+        for root, affix in zip(roots, affixes):
+            if self.is_valid_word(root) and affix in self.get_affixes_for_root(root):
                 valid_roots.append(root)
-
-        # Check if the affixes are valid and if they can be attached to the roots
-        for affix in affixes:
-            if any(affix in self.get_affixes_for_root(root) for root in roots):
                 valid_affixes.append(affix)
+                print(f"Found valid root {root} for word {word} with affix {affix}")
 
-        # If the typed word does not have both valid root and valid affix, return empty list
-        if not valid_roots and not valid_affixes:
-            return [], []
-       
         return valid_roots, valid_affixes
-
-    def get_affixes_for_root(self, root):
-        return self.words.get(root, [])
-
-    def get_classes_for_root(self, root):
-        return self.words.get(root, [])

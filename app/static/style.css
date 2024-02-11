@@ -67,7 +67,7 @@ h1 {
 .misspelled {
     text-decoration-line: underline;
     text-decoration-style: wavy;
-    text-decoration-color: rgb(223, 125, 125);
+    text-decoration-color: red;
     text-decoration-thickness: 1px;
     padding-bottom: 2px;
     transition: text-decoration-color 0.3s;
@@ -84,25 +84,61 @@ h1 {
     border: 1px solid #ccc;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     max-height: 150px;
-    overflow-y: auto;
+    overflow: hidden;
     z-index: 1000;
-    width: 80%;
+    width: 300px; /* Adjust to match the width in your image */
     border-radius: 8px;
-}
-
-#suggestions ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    padding: 10px 0;
+    display: none;
+    flex-direction: column; /* Add this line */
 }
 
 #suggestions li {
+    list-style-type: none !important;
     padding: 10px;
     border-bottom: 1px solid #eee;
-    cursor: pointer;
+    cursor: default;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 #suggestions li:hover {
-    background-color: #007bff;
-    color: white;
+    background-color: #d6edef; 
+    
+}
+
+#suggestion-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    width: 100%;
+}
+
+
+
+.bi bi-slash-circle:hover::after { /* Corrected class name */
+    content: "Ignore All";
+    position: absolute;
+    background-color: #fff;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    top: -20px;
+    left: -10px;
+}
+
+
+.bi-file-earmark-plus:hover::after { /* Corrected class name */
+    content: "Add to Dictionary";
+    position: absolute;
+    background-color: #fff;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    top: -20px;
+    right: -10px;
+}
+
+.bi-file-earmark-plus{
+    margin-right: 20px;
 }

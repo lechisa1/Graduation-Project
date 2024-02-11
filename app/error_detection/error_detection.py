@@ -14,6 +14,7 @@ class ErrorDetection:
         for root in roots:
             if self.knowledge_base.is_valid_word(root):
                 root_affixes = self.knowledge_base.get_affixes_for_root(root)
+                # print(f"roots on ED:{root_affixes}")
                 if all(affix in root_affixes for affix in affixes):
                     return True
         return False

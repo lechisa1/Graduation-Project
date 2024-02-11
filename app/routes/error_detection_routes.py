@@ -19,6 +19,6 @@ def detect_errors():
     for token in tokens:
         if not error_detection.is_valid_word(token):
             errors.append(token)
-            print(f"Misspelt word: {errors}")
+            
 
     return jsonify({'errors': errors})

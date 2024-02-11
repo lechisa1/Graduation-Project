@@ -8,7 +8,7 @@ morphological_generator_routes = Blueprint('morphological_generator_routes', __n
 def generate_words():
     print("Received request for generating words.")
     data = request.get_json()
-    corrections = data.get('corrections', [])
+    corrections = data.get('morphemes', [])
     print(f"Received corrections: {corrections}")
     
     kb = KnowledgeBase('app/knowledge_base/resources/dictionary.dic', 'app/knowledge_base/resources/dictionary.aff')
@@ -19,9 +19,9 @@ def generate_words():
 
     words = []
     for correction in corrections:
-        word = morphological_generator.generate_word(correction)
-        words.append(word)
-        print(f"Generated word: {word}")
+        word = morphological_generator.generate_words(correction)
+        words.extend(word)  # Extend the list of words
+        print(f"Generated words: {word}")
 
     print(f"Returning generated words: {words}")
     return jsonify({'words': words})

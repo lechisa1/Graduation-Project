@@ -1,84 +1,97 @@
-var caretPosition = 0; // Define caretPosition
+var caretPosition = 0;
 
-function tokenizeText() {
-    var inputText = document.getElementById("inputText");
-    caretPosition = getCaretPosition(inputText); // Update caretPosition
-    var text = inputText.innerText;
+async function tokenizeText() {
+    try {
+        var inputText = document.getElementById("inputText");
+        caretPosition = getCaretPosition(inputText);
+        var text = inputText.innerText;
 
-    // Send the input text to the server for tokenization
-    fetch("/tokenize", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            text: text,
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Returned Tokens:", data.tokens);
-
-        fetch("/detect_errors", {
+        // Send the input text to the server for tokenization
+        const tokenizeResponse = await fetch("/tokenize", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                tokens: data.tokens,
+                text: text,
             }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Detected Errors:", data.errors);
-            applyErrorStyling(data.errors);
-            fetch("/correct_errors",{
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json",
+        });
+        const tokenizeData = await tokenizeResponse.json();
+        console.log("Returned Tokens:", tokenizeData.tokens);
+
+        // Detect errors
+        const detectErrorsResponse = await fetch("/detect_errors", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                tokens: tokenizeData.tokens,
+            }),
+        });
+        const detectErrorsData = await detectErrorsResponse.json();
+        console.log("Detected Errors:", detectErrorsData.errors);
+
+        // Correct errors and generate suggestions for each error
+        let corrections = [];
+        let allSuggestions = {};
+        for (let error of detectErrorsData.errors) {
+            const correctErrorsResponse = await fetch("/correct_errors", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    errors: data.errors,
+                    errors: [error],
                 }),
-            })
-            
-            .then(response=>response.json())
-            .then(data=>{
-                console.log('Returned Corrections:', data.corrections);
-                // Send the corrected words to the morphological generator route
-                fetch("/generate_words",{
-                    method:"POST",
-                    headers:{
-                        "Content-Type":"application/json",
-                    },
-                    body: JSON.stringify({
-                        morphemes: data.corrections,
-                    }),
-                })
-                .then(response=>response.json())
-                .then(data=>{
-                    console.log('Generated Words:', data.words);
-                })
-                .catch(error=>console.log('Error: ',error));
-            })
-            .catch(error=>console.log("Error: ",error));
-        })
-        .catch(error => console.error("Error:", error));
-    })
-    .catch(error => console.error("Error:", error));
+            });
+            const correctErrorsData = await correctErrorsResponse.json();
+            console.log('Returned Corrections:', correctErrorsData.corrections);
+            corrections.push(...correctErrorsData.corrections);
+
+            // Generate words
+            const generateWordsResponse = await fetch("/generate_words", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    morphemes: correctErrorsData.corrections,
+                }),
+            });
+            const generateWordsData = await generateWordsResponse.json();
+            console.log('Generated Words:', generateWordsData.words);
+            allSuggestions[error] = generateWordsData.words;
+        }
+
+        // Apply styling with ranked suggestions
+        
+        applyErrorStyling(detectErrorsData.errors, allSuggestions);
+
+        // Handle the server response for ranked suggestions if needed
+        console.log("Ranked Suggestions:",allSuggestions)
+
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }
 
-function applyErrorStyling(errors) {
+function applyErrorStyling(errors, suggestions) {
     var inputTextContainer = document.getElementById("inputText");
     var words = inputTextContainer.innerText.split(" ");
-    
-    inputTextContainer.innerHTML = "";
 
+    inputTextContainer.innerHTML = "";
+    
     words.forEach(word => {
         var span = document.createElement("span");
         span.textContent = word + " ";
         if (errors.includes(word.trim())) {
             span.classList.add("misspelled");
+            span.onclick = function() {
+                // Find the suggestions for this specific word
+                var wordSuggestions = suggestions[word.trim()];
+                displaySuggestions(wordSuggestions, word.trim(), span);
+            };
         }
         inputTextContainer.appendChild(span);
     });
@@ -86,6 +99,94 @@ function applyErrorStyling(errors) {
     setCaretPosition(inputTextContainer);
 }
 
+function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
+    var suggestionsContainer = document.getElementById("suggestions");
+    suggestionsContainer.innerHTML = ""; // Clear previous suggestions
+
+    // Limit the number of suggestions
+    var maxSuggestions = 3;
+    suggestions = suggestions.slice(0, maxSuggestions);
+
+    suggestions.forEach(suggestion => {
+        var listItem = document.createElement("li");
+        listItem.textContent = suggestion;
+        listItem.onclick = function() {
+            replaceMisspelledWord(misspelledWord, suggestion);
+            suggestionsContainer.innerHTML = ""; // Clear suggestions after selecting one
+            suggestionsContainer.style.display = "none"; // Hide the suggestions container
+        };
+        suggestionsContainer.appendChild(listItem);
+    });
+
+    // Create a new div for the icons
+    var iconsDiv = document.createElement("div");
+    iconsDiv.id = "suggestion-actions";
+    iconsDiv.style.display = "flex";
+    iconsDiv.style.justifyContent = "space-between";
+
+    // Create the left icon and add the hover text
+    var leftIcon = document.createElement("i");
+    leftIcon.className = "bi bi-slash-circle"; // Use Bootstrap icon class
+    leftIcon.title = "Ignore All";
+    
+    leftIcon.onclick = function() {
+        fetch('/add_to_ignored_words', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                word: misspelledWord,
+            }),
+        }).then(response => response.json())
+          .then(data => {
+              console.log("Added error word to ignored words:", data.message);
+          });
+    };
+    iconsDiv.appendChild(leftIcon);
+
+    // Create the right icon and add the hover text
+    var rightIcon = document.createElement("i");
+    rightIcon.className = "bi bi-file-earmark-plus"; // Use Bootstrap icon class
+    rightIcon.title = "Add to Dictionary";
+    console.log("misspelt word",misspelledWord)
+    rightIcon.onclick = function() {
+        fetch('/add_to_custom_dictionary', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                word: misspelledWord,
+            }),
+        }).then(response => response.json())
+          .then(data => {
+              console.log("Added error word to ignored words:", data.message);
+          });
+        
+    };
+    iconsDiv.appendChild(rightIcon);
+
+    // Add the icons div to the suggestions container
+    suggestionsContainer.appendChild(iconsDiv);
+
+    // Position the suggestions container below the misspelled word
+    var rect = misspelledSpan.getBoundingClientRect();
+    suggestionsContainer.style.top = rect.bottom + "px";
+    suggestionsContainer.style.left = rect.left + "px";
+
+    // Show the suggestions container
+    suggestionsContainer.style.display = "block";
+}
+
+
+
+function replaceMisspelledWord(misspelledWord, suggestion) {
+    var inputTextContainer = document.getElementById("inputText");
+    var text = inputTextContainer.innerText;
+    var updatedText = text.replace(new RegExp('\\b' + misspelledWord + '\\b'), suggestion);
+    inputTextContainer.innerText = updatedText;
+}
 
 function handlePaste(e) {
     e.preventDefault();
@@ -130,15 +231,23 @@ function setCaretPosition(editableDiv) {
     var range = document.createRange();
     var sel = window.getSelection();
     range.selectNodeContents(editableDiv);
-    range.collapse(false); // Collapse the range to the end point. false means collapse to end rather than the start
+    range.collapse(false);
     sel.removeAllRanges();
     sel.addRange(range);
 }
 
-
 function handleInput(event) {
-    var char = event.data; // The character that was inserted
-    if (char === ' ' || char === '.' || char === ',' || char === '!' || char === '?') {
+    var char = event.data;
+    if (char === '.' || char === ' ' || char === ',' || char === '!' || char === '?') {
         tokenizeText();
     }
 }
+
+// Hide the suggestions container when clicking outside
+document.addEventListener('click', function(event) {
+    var inputTextContainer = document.getElementById("inputText");
+    var suggestionsContainer = document.getElementById("suggestions");
+    if (!inputTextContainer.contains(event.target) && !suggestionsContainer.contains(event.target)) {
+        suggestionsContainer.style.display = "none";
+    }
+});
