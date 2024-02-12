@@ -73,6 +73,10 @@ h1 {
     transition: text-decoration-color 0.3s;
 }
 
+.corrected {
+    text-decoration-line: none; /* Remove underline for corrected words */
+    padding-bottom: 2px;
+}
 .misspelled:hover {
     text-decoration-color: darkred;
     background-color: rgba(223, 125, 125, 0.2);

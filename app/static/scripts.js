@@ -4,7 +4,7 @@ async function tokenizeText() {
     try {
         var inputText = document.getElementById("inputText");
         caretPosition = getCaretPosition(inputText);
-        var text = inputText.innerText;
+        var text = inputText.textContent;
 
         // Send the input text to the server for tokenization
         const tokenizeResponse = await fetch("/tokenize", {
@@ -78,14 +78,16 @@ async function tokenizeText() {
 
 function applyErrorStyling(errors, suggestions) {
     var inputTextContainer = document.getElementById("inputText");
-    var words = inputTextContainer.innerText.split(" ");
+    // Modify the pattern to capture spaces
+    var pattern = /(\b[\w\'-]+(?:[.,])?\b|\d+|[.,]|\s)/g;
+    var words = inputTextContainer.textContent.match(pattern);
 
     inputTextContainer.innerHTML = "";
     
     words.forEach(word => {
         var span = document.createElement("span");
-        span.textContent = word + " ";
-        if (errors.includes(word.trim())) {
+        span.textContent = word;
+        if (word.trim() && errors.includes(word.trim())) {
             span.classList.add("misspelled");
             span.onclick = function() {
                 // Find the suggestions for this specific word
@@ -98,6 +100,7 @@ function applyErrorStyling(errors, suggestions) {
 
     setCaretPosition(inputTextContainer);
 }
+
 
 function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
     var suggestionsContainer = document.getElementById("suggestions");
@@ -112,6 +115,7 @@ function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
         listItem.textContent = suggestion;
         listItem.onclick = function() {
             replaceMisspelledWord(misspelledWord, suggestion);
+            misspelledSpan.classList.remove("misspelled");
             suggestionsContainer.innerHTML = ""; // Clear suggestions after selecting one
             suggestionsContainer.style.display = "none"; // Hide the suggestions container
         };
@@ -142,6 +146,8 @@ function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
           .then(data => {
               console.log("Added error word to ignored words:", data.message);
           });
+          suggestionsContainer.style.display = "none"; 
+          misspelledSpan.classList.remove("misspelled");
     };
     iconsDiv.appendChild(leftIcon);
 
@@ -149,7 +155,7 @@ function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
     var rightIcon = document.createElement("i");
     rightIcon.className = "bi bi-file-earmark-plus"; // Use Bootstrap icon class
     rightIcon.title = "Add to Dictionary";
-    console.log("misspelt word",misspelledWord)
+
     rightIcon.onclick = function() {
         fetch('/add_to_custom_dictionary', {
             method: 'POST',
@@ -161,8 +167,10 @@ function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
             }),
         }).then(response => response.json())
           .then(data => {
-              console.log("Added error word to ignored words:", data.message);
+              console.log("Added error word to custome dictionary words:", data.message);
           });
+          suggestionsContainer.style.display = "none"; 
+          misspelledSpan.classList.remove("misspelled");
         
     };
     iconsDiv.appendChild(rightIcon);
@@ -182,10 +190,32 @@ function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
 
 
 function replaceMisspelledWord(misspelledWord, suggestion) {
-    var inputTextContainer = document.getElementById("inputText");
-    var text = inputTextContainer.innerText;
-    var updatedText = text.replace(new RegExp('\\b' + misspelledWord + '\\b'), suggestion);
-    inputTextContainer.innerText = updatedText;
+    const inputTextContainer = document.getElementById("inputText");
+    const text = inputTextContainer.textContent;
+
+    const range = document.createRange();
+    range.selectNodeContents(inputTextContainer);
+
+    const walker = document.createTreeWalker(
+        inputTextContainer,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+
+    let currentNode;
+
+    while ((currentNode = walker.nextNode())) {
+        const index = currentNode.textContent.indexOf(misspelledWord);
+
+        if (index !== -1) {
+            range.setStart(currentNode, index);
+            range.setEnd(currentNode, index + misspelledWord.length);
+            range.deleteContents();
+            range.insertNode(document.createTextNode(suggestion));
+            break;
+        }
+    }
 }
 
 function handlePaste(e) {
@@ -238,7 +268,7 @@ function setCaretPosition(editableDiv) {
 
 function handleInput(event) {
     var char = event.data;
-    if (char === '.' || char === ' ' || char === ',' || char === '!' || char === '?') {
+    if (char === ' ' || char === '.' || char === ',' || char === '!' || char === '?') {
         tokenizeText();
     }
 }

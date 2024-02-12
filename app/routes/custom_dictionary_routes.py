@@ -7,11 +7,11 @@ kb = KnowledgeBase('app/knowledge_base/resources/dictionary.dic', 'app/knowledge
 @custom_dictionary_routes.route('/add_to_custom_dictionary', methods=['POST'])
 def add_to_ignored_words():
     data = request.get_json()
-    print(f"data from ingored:{data}")
+    print(f"data from custom dictionary:{data}")
     word = data.get('word',[])
-    print(f"word from ingored:{word}")
+    print(f"data from custom dictionary:{word}")
     if word:
         kb.add_to_custom_dictionary(word)
-        return jsonify({'message': f'Added {word} to ignored words.'}), 200
+        return jsonify({'message': f'Added {word} to custom dictionary words.'}), 200
     else:
         return jsonify({'message': 'No word provided.'}), 400
