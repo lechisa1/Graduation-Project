@@ -79,7 +79,8 @@ async function tokenizeText() {
 function applyErrorStyling(errors, suggestions) {
     var inputTextContainer = document.getElementById("inputText");
     // Modify the pattern to capture spaces
-    var pattern = /(\b[\w\'-]+(?:[.,])?\b|\d+|[.,]|\s)/g;
+    var pattern = /(\b[\w\'-]+(?:[.,;:!?])?\b|\d+|[.,;:!?()!]|\s)/g;
+
     var words = inputTextContainer.textContent.match(pattern);
 
     inputTextContainer.innerHTML = "";
