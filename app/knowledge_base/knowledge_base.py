@@ -126,5 +126,5 @@ class KnowledgeBase:
             if self.is_valid_word(root) and affix in self.get_affixes_for_root(root):
                 valid_roots.append(root)
                 valid_affixes.append(affix)
-
+        print(f"valid roots:{valid_roots}, valid affixes:{valid_affixes}")
         return valid_roots, valid_affixes
