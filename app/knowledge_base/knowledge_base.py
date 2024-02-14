@@ -1,7 +1,10 @@
 import string
 import json
-import os  # Add this import for working with file paths
+import os
 
+verbClasses = ['V1','V2','V3','V4','V5','V6','V7','V8','V9','V10']
+nounClasses = ['N1','N2','N3','N4','N5','N6','N7']
+consonants=['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','y','z']
 class KnowledgeBase:
     def __init__(self, dictionary_file_path, affix_file_path):
         self.dictionary_file_path = dictionary_file_path
@@ -20,104 +23,144 @@ class KnowledgeBase:
                 
                 if len(values) == 5:
                     option_name, flag, stripping, affix, condition = values
-                    self.affixes[flag] = {
+                    if flag not in self.affixes:
+                        self.affixes[flag] = []
+                    self.affixes[flag].append({
                         'option_name': option_name,
+                        'flag': flag,
                         'stripping': stripping,
                         'affix': affix,
                         'condition': condition
-                    }
+                    })
+                    # print(f"Added affix {affix} to class {flag}")
+                    
 
         with open(self.dictionary_file_path, 'r') as f:
             for line in f:
                 if '/' in line:
                     rootWord, affix_classes = line.strip().split('/')
-                    self.words[rootWord] = [self.affixes[affix]['affix'] for affix in affix_classes.split(',') if affix in self.affixes]
+                    self.words[rootWord] = [affix['affix'] for affix_class in affix_classes.split(',') for affix in self.affixes.get(affix_class, [])]
+                    # print(f"Added word {rootWord} with affixes {self.words[rootWord]}")
+                    
                 else:
                     rootWord = line.strip()
-                    self.words[rootWord] = {}
+                    self.words[rootWord] = []
+                    # print(f"Added word {rootWord} with no affixes")
 
     def loadLocalStorage(self):
         try:
             with open('custom_dictionary.json', 'r') as file:
                 data = json.load(file)
                 self.custom_dictionary = set(data['custom_dictionary'])
+                # print(f"Loaded custom dictionary: {self.custom_dictionary}")
         except FileNotFoundError:
-            pass  # File doesn't exist, which is fine
+            print("No custom dictionary found")
 
         try:
             with open('ignored_words.json', 'r') as file:
                 data = json.load(file)
                 self.ignored_words = set(data['ignored_words'])
+                # print(f"Loaded ignored words: {self.ignored_words}")
         except FileNotFoundError:
-            pass  # File doesn't exist, which is fine
+            print("No ignored words found")
 
     def saveLocalStorage(self):
         data_custom = {'custom_dictionary': list(self.custom_dictionary)}
         with open('custom_dictionary.json', 'w') as file:
             json.dump(data_custom, file)
+            # print(f"Saved custom dictionary: {self.custom_dictionary}")
 
         data_ignored = {'ignored_words': list(self.ignored_words)}
         with open('ignored_words.json', 'w') as file:
             json.dump(data_ignored, file)
+            # print(f"Saved ignored words: {self.ignored_words}")
 
     def is_valid_word(self, rootWord):
+        rootWord = rootWord.lower()
+        punctuation = string.punctuation.replace("'", "") 
         # Remove punctuation from the rootWord
-        rootWord_without_punctuation = rootWord.translate(str.maketrans('', '', string.punctuation))
-
+        rootWord_without_punctuation = rootWord.translate(str.maketrans('', '', punctuation))
+        # print(f"rootWord_without_punctuation is {rootWord_without_punctuation}")
+        rootWord_filtered = rootWord_without_punctuation
+        # print(f"Converted rootword from capital to small is {rootWord_filtered}")
         # Check if the rootWord without punctuation is in the words or custom_dictionary
-        return any(
-            rootWord_without_punctuation == word or rootWord_without_punctuation in affixes
+        is_valid = any(
+            rootWord_filtered == word.lower() or rootWord_filtered in affixes
             for word, affixes in self.words.items()
-        ) or rootWord_without_punctuation in self.custom_dictionary or rootWord_without_punctuation in self.ignored_words
+        ) or rootWord_filtered in self.custom_dictionary or rootWord_filtered in self.ignored_words
+        # print(f"Word {rootWord_filtered} is valid: {is_valid}")
+        return is_valid
 
     def add_to_custom_dictionary(self, word):
-        print(f"Adding {word} to custom dictionary...")
+        # print(f"Adding {word} to custom dictionary...")
         self.custom_dictionary.add(word)
         self.saveLocalStorage()
 
     def ignore_word(self, word):
-        print(f"Ignoring word {word}...")
+        # print(f"Ignoring word {word}...")
         self.ignored_words.add(word)
         self.saveLocalStorage()
 
     def get_affixes_for_root(self, rootWord):
-        return self.words.get(rootWord, [])
+        affixes = self.words.get(rootWord, [])
+        print(f"Affixes for {rootWord}: {affixes}")
+        return affixes
 
     def find_valid_root_for_affix(self, affix):
         valid_roots = []
         for root, affixes in self.words.items():
             if affix in affixes:
                 valid_roots.append(root)
+        print(f"Valid roots for {affix}: {valid_roots}")
         return valid_roots
 
     def morphological_analysis(self, word):
+        word = word.lower()
         if word in self.ignored_words:
+            # print(f"Word {word} is ignored")
             return [word], []  # If the word is ignored, it's considered valid
 
         roots = []
         affixes = []
 
-        for affix, rule in self.affixes.items():
-            if word.endswith(rule['affix']):
-                if rule['stripping'] != '0':
-                    stripped_letter = rule['stripping']
-                    root = word[:len(word) - len(rule['affix'])] + stripped_letter
+        for affix_class, rules in self.affixes.items():
+           
+            for rule in rules:
+               
+                if word.endswith(rule['affix']) and rule['flag'] in verbClasses :
+                    if rule['stripping'] != '0':
+                        stripped_letter = rule['stripping']
+                        root = word[:len(word) - len(rule['affix'])] + stripped_letter
+                        roots.append(root)
+                        affixes.append(rule['affix'])
+                    else:
+                        root = word[:len(word) - len(rule['affix'])]
                     roots.append(root)
                     affixes.append(rule['affix'])
-                else:
-                    root = word[:len(word) - len(rule['affix'])]
-                roots.append(root)
-                affixes.append(rule['affix'])
+                        
+                elif word.endswith(rule['affix']) and rule['flag'] in nounClasses :
+                    if rule['stripping'] != '0':
+                        stripped_letter = rule['stripping']
+                        root = word[:len(word) - len(rule['affix'])] + stripped_letter
+                        roots.append(root)
+                        affixes.append(rule['affix'])
+                    else:
+                        root = word[:len(word) - len(rule['affix'])]        
+           
+                    roots.append(root)
+                    affixes.append(rule['affix'])
+                    
             
-        for affix, rule in self.affixes.items():
-            if word.startswith(rule['affix']):
-                if rule['stripping'] != '0':
-                    stripped_letter = rule['stripping']
-                    root = word[len(rule['affix']):] + stripped_letter
-                else:
-                    root = word[len(rule['affix']):]
-                roots.append(root)
-                affixes.append(rule['affix'])
+        for affix_class, rules in self.affixes.items():
+            for rule in rules:
+                if word.startswith(rule['affix']):
+                    if rule['stripping'] != '0':
+                        stripped_letter = rule['stripping']
+                        root = word[len(rule['affix']):] + stripped_letter
+                    else:
+                        root = word[len(rule['affix']):]
+                    roots.append(root)
+                    affixes.append(rule['affix'])
 
         valid_roots = []
         valid_affixes = []
@@ -126,5 +169,6 @@ class KnowledgeBase:
             if self.is_valid_word(root) and affix in self.get_affixes_for_root(root):
                 valid_roots.append(root)
                 valid_affixes.append(affix)
-        print(f"valid roots:{valid_roots}, valid affixes:{valid_affixes}")
+
+        print(f"Valid roots and affixes for {word}: {valid_roots}, {valid_affixes}")
         return valid_roots, valid_affixes
