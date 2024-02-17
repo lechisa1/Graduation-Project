@@ -1,9 +1,10 @@
 
-PFX P2 Y 1 
-PFX P2 0 gag gab 
 
-PFX P3 Y 1 
-PFX P3 0 hin deem
+
+PFX P1 Y 1
+PFX P1 0 gag gab
+
+
 
 REP a aa 
 REP aa a 
@@ -590,7 +591,14 @@ SFX V3 0 aatii g
 SFX V3 0 umsa g
 SFX V3 0 iisa g
 SFX V3 0 iinsa g
+SFX V3 0 ina g
+SFX V3 0 ine g
+SFX V3 0 inu g
+SFX V3 0 amnaan g
+SFX V3 0 ame g
 
+SFX V3 0 anne g
+SFX V3 0 anii g
 
 SFX V3 Y 68
 SFX V3 0 da d
@@ -735,8 +743,9 @@ SFX V3 0 iinsa b
 
 
 SFX V4 Y 83
-SFX V4 0 nna t
-SFX V4 0 nnu t
+SFX V4 t nna t
+SFX V4 t nne t
+SFX V4 t nnu t
 SFX V4 0 dha t
 SFX V4 0 dhe t
 SFX V4 0 dhu t
@@ -754,7 +763,7 @@ SFX V4 0 chiistan t
 SFX V4 0 chiisne t
 SFX V4 0 iinsa t
 SFX V4 0 iisa t
-SFX V4 0 noo t
+SFX V4 t nnoo t
 SFX V4 0 ta t
 SFX V4 0 tani t
 SFX V4 0 taniittu t

@@ -39,6 +39,7 @@ class ErrorCorrection:
 
         for valid_word in valid_words:
             distance = self.weighted_levenshtein(valid_word, corrected_error)
+            
             if distance < min_distance:
                 min_distance = distance
                 closest_words = [valid_word]

@@ -34,13 +34,14 @@ class KnowledgeBase:
                     })
                     # print(f"Added affix {affix} to class {flag}")
                     
+                    
 
         with open(self.dictionary_file_path, 'r') as f:
             for line in f:
                 if '/' in line:
                     rootWord, affix_classes = line.strip().split('/')
                     self.words[rootWord] = [affix['affix'] for affix_class in affix_classes.split(',') for affix in self.affixes.get(affix_class, [])]
-                    # print(f"Added word {rootWord} with affixes {self.words[rootWord]}")
+                    # print(f"Added word with affixes {self.words}")
                     
                 else:
                     rootWord = line.strip()
@@ -77,7 +78,7 @@ class KnowledgeBase:
 
     def is_valid_word(self, rootWord):
         rootWord = rootWord.lower()
-        punctuation = string.punctuation.replace("'", "") 
+        punctuation = string.punctuation.replace("'", "").replace("-", "") 
         # Remove punctuation from the rootWord
         rootWord_without_punctuation = rootWord.translate(str.maketrans('', '', punctuation))
         # print(f"rootWord_without_punctuation is {rootWord_without_punctuation}")
@@ -103,7 +104,7 @@ class KnowledgeBase:
 
     def get_affixes_for_root(self, rootWord):
         affixes = self.words.get(rootWord, [])
-        print(f"Affixes for {rootWord}: {affixes}")
+        # print(f"Affixes for {rootWord}: {affixes}")
         return affixes
 
     def find_valid_root_for_affix(self, affix):
@@ -111,11 +112,12 @@ class KnowledgeBase:
         for root, affixes in self.words.items():
             if affix in affixes:
                 valid_roots.append(root)
-        print(f"Valid roots for {affix}: {valid_roots}")
+        # print(f"Valid roots for {affix}: {valid_roots}")
         return valid_roots
 
     def morphological_analysis(self, word):
         word = word.lower()
+        print(f"word:{word}")
         if word in self.ignored_words:
             # print(f"Word {word} is ignored")
             return [word], []  # If the word is ignored, it's considered valid
@@ -126,8 +128,9 @@ class KnowledgeBase:
         for affix_class, rules in self.affixes.items():
            
             for rule in rules:
-               
+                
                 if word.endswith(rule['affix']) and rule['flag'] in verbClasses :
+                    
                     if rule['stripping'] != '0':
                         stripped_letter = rule['stripping']
                         root = word[:len(word) - len(rule['affix'])] + stripped_letter
@@ -137,11 +140,13 @@ class KnowledgeBase:
                         root = word[:len(word) - len(rule['affix'])]
                     roots.append(root)
                     affixes.append(rule['affix'])
+                    # print(f"rule of condtion:{rule['condition']}")
                         
                 elif word.endswith(rule['affix']) and rule['flag'] in nounClasses :
                     if rule['stripping'] != '0':
                         stripped_letter = rule['stripping']
                         root = word[:len(word) - len(rule['affix'])] + stripped_letter
+                        # print(f"rootsss:{root}")
                         roots.append(root)
                         affixes.append(rule['affix'])
                     else:
@@ -153,12 +158,14 @@ class KnowledgeBase:
             
         for affix_class, rules in self.affixes.items():
             for rule in rules:
-                if word.startswith(rule['affix']):
+                if word.startswith(rule['affix']) and rule['option_name']== 'PFX':
                     if rule['stripping'] != '0':
                         stripped_letter = rule['stripping']
-                        root = word[len(rule['affix']):] + stripped_letter
+                        root = word[len(rule['affix']):] 
+                        
                     else:
                         root = word[len(rule['affix']):]
+                        
                     roots.append(root)
                     affixes.append(rule['affix'])
 

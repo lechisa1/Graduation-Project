@@ -1,5 +1,6 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto Mono', monospace; 
+    font-size: 20px;
     background: linear-gradient(to right, #f8f9fa, #e9ecef);  /* Add gradient background */
     color: #343a40;
     margin: 0;
@@ -73,10 +74,7 @@ h1 {
     transition: text-decoration-color 0.3s;
 }
 
-.corrected {
-    text-decoration-line: none; /* Remove underline for corrected words */
-    padding-bottom: 2px;
-}
+
 .misspelled:hover {
     text-decoration-color: darkred;
     background-color: rgba(223, 125, 125, 0.2);
@@ -87,7 +85,7 @@ h1 {
     background-color: white;
     border: 1px solid #ccc;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-height: 150px;
+    max-height: 300px;
     overflow: hidden;
     z-index: 1000;
     width: 300px; /* Adjust to match the width in your image */
@@ -146,3 +144,5 @@ h1 {
 .bi-file-earmark-plus{
     margin-right: 20px;
 }
+
+

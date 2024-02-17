@@ -7,9 +7,9 @@ kb = KnowledgeBase('app/knowledge_base/resources/dictionary.dic', 'app/knowledge
 @ignored_word_routes.route('/add_to_ignored_words', methods=['POST'])
 def add_to_ignored_words():
     data = request.get_json()
-    print(f"data from ingored:{data}")
+    # print(f"data from ingored:{data}")
     word = data.get('word',[])
-    print(f"word from ingored:{word}")
+    # print(f"word from ingored:{word}")
     if word:
         kb.ignore_word(word)
         return jsonify({'message': f'Added {word} to ignored words.'}), 200

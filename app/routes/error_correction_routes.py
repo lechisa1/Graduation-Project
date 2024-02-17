@@ -9,7 +9,7 @@ error_correction_routes = Blueprint('error_correction_routes', __name__)
 def correct_errors():
     data = request.get_json()
     errors = data.get('errors', [])
-    print(f"Errors from error detection: {errors}")
+    # print(f"Errors from error detection: {errors}")
     kb = KnowledgeBase('app/knowledge_base/resources/dictionary.dic', 'app/knowledge_base/resources/dictionary.aff')
     ma = MorphologicalAnalyzer(kb)
     error_correction = ErrorCorrection(kb, ma, 'app/knowledge_base/resources/dictionary.aff')  # Pass the .aff file path to ErrorCorrection
@@ -17,7 +17,7 @@ def correct_errors():
     corrections = []
     for error in errors:
         correction = error_correction.correct_error(error) 
-        print(f"correction from error correction routes: {correction}")
+        # print(f"correction from error correction routes: {correction}")
         corrections.append(correction)
 
     return jsonify({'corrections': corrections})
