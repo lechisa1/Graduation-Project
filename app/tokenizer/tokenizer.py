@@ -6,5 +6,6 @@ def tokenize(text):
 
     # Use the regular expression to find all tokens in the input text
     tokens = pattern.findall(text)
+    
 
     return tokens

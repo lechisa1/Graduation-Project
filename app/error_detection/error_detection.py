@@ -11,6 +11,7 @@ class ErrorDetection:
             return True
  
         roots, affixes = self.morphological_analyzer.analyze(word)
+        # print("roots: ",roots,"affixes: ",affixes)
         for root in roots:
             if self.knowledge_base.is_valid_word(root):
                 root_affixes = self.knowledge_base.get_affixes_for_root(root)

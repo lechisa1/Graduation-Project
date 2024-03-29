@@ -35,6 +35,7 @@ class KnowledgeBase:
                     # print(f"Added affix {affix} to class {flag}")
                     
                     
+                    
 
         with open(self.dictionary_file_path, 'r') as f:
             for line in f:
@@ -78,7 +79,7 @@ class KnowledgeBase:
 
     def is_valid_word(self, rootWord):
         rootWord = rootWord.lower()
-        punctuation = string.punctuation.replace("'", "").replace("-", "") 
+        punctuation = string.punctuation.replace("'", "").replace("-", "")
         # Remove punctuation from the rootWord
         rootWord_without_punctuation = rootWord.translate(str.maketrans('', '', punctuation))
         # print(f"rootWord_without_punctuation is {rootWord_without_punctuation}")
