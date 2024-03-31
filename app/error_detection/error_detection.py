@@ -1,14 +1,17 @@
 from app.knowledge_base.knowledge_base import KnowledgeBase
 from app.morphological_analyzer.morphological_analyzer import MorphologicalAnalyzer
-
+from app.knowledge_base.knowledge_base import nounClasses
 class ErrorDetection:
     def __init__(self, knowledge_base: KnowledgeBase, morphological_analyzer: MorphologicalAnalyzer):
         self.knowledge_base = knowledge_base
         self.morphological_analyzer = morphological_analyzer
 
     def is_valid_word(self, word):
-        if self.knowledge_base.is_valid_word(word):
+        affixClass= self.knowledge_base.get_affix_class_for_root(word)
+        print('affixClasssss: ', affixClass)
+        if self.knowledge_base.is_valid_word(word) and affixClass in nounClasses :
             return True
+        
  
         roots, affixes = self.morphological_analyzer.analyze(word)
         # print("roots: ",roots,"affixes: ",affixes)

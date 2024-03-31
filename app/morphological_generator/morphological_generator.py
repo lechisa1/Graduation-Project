@@ -1,11 +1,18 @@
+
+from app.knowledge_base.knowledge_base import KnowledgeBase
+from app.knowledge_base.knowledge_base import  nounClasses
+from app.error_correction.error_correction import ErrorCorrection
 class MorphologicalGenerator:
-    def __init__(self, knowledge_base):
+    def __init__(self, knowledge_base: KnowledgeBase,):
         self.knowledge_base = knowledge_base
 
     def generate_words(self, input_morphemes):
         correct_words = []
 
+        
+
         for morpheme in input_morphemes:
+           
             if self.knowledge_base.is_valid_word(morpheme):  # If the morpheme is a valid root
                 word_forms = self.generate_word_forms_from_root(morpheme)
             else:  # If the morpheme is an affix
@@ -18,7 +25,8 @@ class MorphologicalGenerator:
         word_forms = []
 
         # Case 1: Root word with no affix
-        if self.knowledge_base.is_valid_word(root):
+        affixClass= self.knowledge_base.get_affix_class_for_root(root)
+        if self.knowledge_base.is_valid_word(root) and affixClass in nounClasses :
             word_forms.append(root)
 
         # Case 2: Root word with affixes
@@ -39,3 +47,6 @@ class MorphologicalGenerator:
             word_forms.append(word_form)
 
         return word_forms
+    
+
+    

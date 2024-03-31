@@ -1,5 +1,6 @@
 import re
 import Levenshtein
+
 from app.knowledge_base.knowledge_base import KnowledgeBase
 from app.morphological_analyzer.morphological_analyzer import MorphologicalAnalyzer
 
@@ -16,19 +17,43 @@ class ErrorCorrection:
                 if line.startswith('REP'):
                     _, rule, replacement = line.strip().split()
                     replacement_rules[rule] = replacement
+        
         return replacement_rules
 
     def apply_replacement_rules(self, error):
         for rule, replacement in self.replacement_rules.items():
-            error = re.sub(r'\b' + re.escape(rule) + r'\b', replacement, error)
+            error = error.replace(rule, replacement)
+            
         return error
+
+    def custom_levenshtein(self, s1, s2):
+        substitution_cost = 2
+        insertion_cost = 1
+        deletion_cost = 7
+
+        matrix = [[0 for j in range(len(s2) + 1)] for i in range(len(s1) + 1)]
+
+        for i in range(len(s1) + 1):
+            matrix[i][0] = i * deletion_cost
+        for j in range(len(s2) + 1):
+            matrix[0][j] = j * insertion_cost
+
+        for i in range(1, len(s1) + 1):
+            for j in range(1, len(s2) + 1):
+                if s1[i - 1] == s2[j - 1]:
+                    substitution = matrix[i - 1][j - 1]
+                else:
+                    substitution = matrix[i - 1][j - 1] + substitution_cost
+                insertion = matrix[i][j - 1] + insertion_cost
+                deletion = matrix[i - 1][j] + deletion_cost
+                matrix[i][j] = min(substitution, insertion, deletion)
+
+        return matrix[len(s1)][len(s2)]
 
     def correct_error(self, error):
         # Apply the replacement rules to the error
         corrected_error = self.apply_replacement_rules(error)
-        print(f"corrected_error:{corrected_error}")
-       
-
+        print("corrected_error: ", corrected_error)
         # Get all valid words from the knowledge base
         valid_words = self.knowledge_base.words.keys()
         
@@ -36,22 +61,23 @@ class ErrorCorrection:
         # Find the valid words that have the minimum Levenshtein distance
         min_distance = float('inf')
         closest_words = []
+        word_distances = {}
 
         for valid_word in valid_words:
-            distance = self.weighted_levenshtein(valid_word, corrected_error)
-            
+            distance = self.custom_levenshtein(valid_word, corrected_error)
+            word_distances[valid_word] = distance
+
             if distance < min_distance:
                 min_distance = distance
                 closest_words = [valid_word]
             elif distance == min_distance:
                 closest_words.append(valid_word)
 
-        print(f"Closest Words: {closest_words}")
+        # Sort closest_words based on their Levenshtein distance to corrected_error
+        closest_words.sort(key=word_distances.get)
 
         # Analyze the morphemes of the corrected error
         valid_roots, valid_affixes = self.morphological_analyzer.analyze(corrected_error)
-        print(f"roots from EC: {valid_roots}")
-        print(f"affixes from EC: {valid_affixes}")
 
         # Check if roots are valid and affixes are not, return valid roots
         if valid_roots and not valid_affixes:
@@ -65,32 +91,5 @@ class ErrorCorrection:
 
         # For now, returning an empty list if both roots and affixes are valid
         else:
+            print('closest_words: ',closest_words)
             return closest_words
-
-    def weighted_levenshtein(self, s1, s2):
-        # You can customize your own weights for insertion, deletion, and substitution here
-        insertion_cost = 1
-        deletion_cost = 1
-        substitution_cost = 1
-
-        rows = len(s1) + 1
-        cols = len(s2) + 1
-
-        distance_matrix = [[0 for _ in range(cols)] for _ in range(rows)]
-
-        for i in range(1, rows):
-            distance_matrix[i][0] = i * insertion_cost
-
-        for j in range(1, cols):
-            distance_matrix[0][j] = j * deletion_cost
-
-        for j in range(1, cols):
-            for i in range(1, rows):
-                cost = 0 if s1[i - 1] == s2[j - 1] else substitution_cost
-                distance_matrix[i][j] = min(
-                    distance_matrix[i - 1][j] + insertion_cost,
-                    distance_matrix[i][j - 1] + deletion_cost,
-                    distance_matrix[i - 1][j - 1] + cost
-                )
-
-        return distance_matrix[rows - 1][cols - 1]

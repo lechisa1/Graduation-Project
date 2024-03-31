@@ -42,7 +42,7 @@ class KnowledgeBase:
                 if '/' in line:
                     rootWord, affix_classes = line.strip().split('/')
                     self.words[rootWord] = [affix['affix'] for affix_class in affix_classes.split(',') for affix in self.affixes.get(affix_class, [])]
-                    # print(f"Added word with affixes {self.words}")
+                    # print(f"Added word with affixes {self.words[rootWord]}")
                     
                 else:
                     rootWord = line.strip()
@@ -180,3 +180,17 @@ class KnowledgeBase:
 
         print(f"Valid roots and affixes for {word}: {valid_roots}, {valid_affixes}")
         return valid_roots, valid_affixes
+    
+    def get_affix_class_for_root(self, word):
+        affix_class = None
+        with open(self.dictionary_file_path, 'r') as f:
+            for line in f:
+                if '/' in line:
+                    rootWord, affix_classes = line.strip().split('/')
+                    if(rootWord == word):
+                        affix_class = affix_classes
+        return affix_class
+   
+            
+                
+                 
