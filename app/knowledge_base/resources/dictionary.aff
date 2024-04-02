@@ -123,6 +123,9 @@ SFX V1 0 aatii k
 SFX V1 0 umsa k
 SFX V1 0 iisa k
 SFX V1 0 iinsa k
+SFX V1 0 sisuu k
+
+
 
 SFX V1 Y 73
 SFX V1 0 ne f
@@ -275,8 +278,82 @@ SFX V1 0 umsa m
 SFX V1 0 iisa m
 SFX V1 0 iinsa m
 
-SFX V1 Y 1
-SFX V1 0 ni n
+
+
+SFX V1 Y 73
+SFX V1 0 ne n
+SFX V1 0 na n
+SFX V1 0 nu n
+SFX V1 0 ta n
+SFX V1 0 tani n
+SFX V1 0 taniittu n
+SFX V1 0 te n
+SFX V1 0 teetta n
+SFX V1 0 ti n
+SFX V1 0 tu n
+SFX V1 0 tuu n
+SFX V1 0 sisa n
+SFX V1 0 sisan n
+SFX V1 0 sise n
+SFX V1 0 siste n
+SFX V1 0 sisna n
+SFX V1 0 sistu n
+SFX V1 0 sisne n
+SFX V1 0 a n
+SFX V1 0 achuu n
+SFX V1 0 achuuf n
+SFX V1 0 adha n
+SFX V1 0 adhe n
+SFX V1 0 adhu n
+SFX V1 0 ama n
+SFX V1 0 amaa n
+SFX V1 0 aman n
+SFX V1 0 amne n
+SFX V1 0 amoo n
+SFX V1 0 amta n
+SFX V1 0 amtan n
+SFX V1 0 amte n
+SFX V1 0 amti n
+SFX V1 0 amtu n
+SFX V1 0 amuuf n
+SFX V1 0 ani n
+SFX V1 0 e n
+SFX V1 0 eera n
+SFX V1 0 i n
+SFX V1 0 uu n
+SFX V1 0 uuf n
+SFX V1 0 neerra n
+SFX V1 0 aaf n
+SFX V1 0 aas n
+SFX V1 0 aatu n
+SFX V1 0 uuttan n
+SFX V1 0 uutti n
+SFX V1 0 aa n
+SFX V1 0 naan n
+SFX V1 0 u n
+SFX V1 0 eeti n
+SFX V1 0 ees n
+SFX V1 0 is n
+SFX V1 0 uufan n
+SFX V1 0 uufi n
+SFX V1 0 uufii n
+SFX V1 0 adhuu n
+SFX V1 0 adhe n
+SFX V1 0 amani n
+SFX V1 0 ame n
+SFX V1 0 amni n
+SFX V1 0 amu n
+SFX V1 0 amtu n
+SFX V1 0 amtani n
+SFX V1 0 amuu n
+SFX V1 0 amuudha n
+SFX V1 0 amuudhaaf n
+SFX V1 0 amuun n
+SFX V1 0 ullee n
+SFX V1 0 aatii n
+SFX V1 0 umsa n
+SFX V1 0 iisa n
+SFX V1 0 iinsa n
 
 
 SFX V2 Y 79
