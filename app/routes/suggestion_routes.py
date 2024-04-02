@@ -16,10 +16,10 @@ def rank_suggestions():
     data = request.get_json()
     suggestions = data.get('suggestions', [])
     misspelled_word = data.get('errors', "")
-    # print(f"Received suggestions: {suggestions}")
-    # print(f"Received misspeltword: {misspelled_word}")
+    print(f"Received suggestions: {suggestions}")
+    print(f"Received misspeltword: {misspelled_word}")
     # Use the SuggestionRanking class to rank suggestions
     ranked_suggestions = suggestion_ranker.rank_suggestions(suggestions, misspelled_word)
 
-    # print(f"Returning ranked suggestions: {ranked_suggestions}")
+    print(f"Returning ranked suggestions: {ranked_suggestions}")
     return jsonify({'ranked_suggestions': ranked_suggestions})

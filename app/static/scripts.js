@@ -57,6 +57,7 @@ async function tokenizeText() {
         },
         body: JSON.stringify({
           morphemes: correctErrorsData.corrections,
+          errors:detectErrorsData.errors
         }),
       });
       const generateWordsData = await generateWordsResponse.json();
@@ -104,7 +105,7 @@ function applyErrorStyling(errors, suggestions) {
 function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
   var suggestionsContainer = document.getElementById("suggestions");
   suggestionsContainer.innerHTML = ""; // Clear previous suggestions
-
+ 
   // Limit the number of suggestions
   var maxSuggestions = 3;
   suggestions = suggestions.slice(0, maxSuggestions);

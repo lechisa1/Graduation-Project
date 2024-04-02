@@ -1,5 +1,6 @@
 N = 3  # Set your desired value for N
 
+
 class SuggestionRanking:
     qwerty_layout = {
         'q': (0, 0), 'w': (0, 1), 'e': (0, 2), 'r': (0, 3), 't': (0, 4),
@@ -54,7 +55,8 @@ class SuggestionRanking:
                 elif word1[i - 1] == word2[j - 1]:
                     dp[i][j] = dp[i - 1][j - 1]
                 else:
-                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i]
+                                       [j - 1], dp[i - 1][j - 1])
 
         return dp[m][n]
 
