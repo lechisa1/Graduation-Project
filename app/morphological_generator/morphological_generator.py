@@ -9,8 +9,6 @@ class MorphologicalGenerator:
     def generate_words(self, input_morphemes):
         correct_words = []
 
-        
-
         for morpheme in input_morphemes:
            
             if self.knowledge_base.is_valid_word(morpheme):  # If the morpheme is a valid root

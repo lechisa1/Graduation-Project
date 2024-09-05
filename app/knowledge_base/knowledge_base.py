@@ -117,73 +117,135 @@ class KnowledgeBase:
                 valid_roots.append(root)
         # print(f"Valid roots for {affix}: {valid_roots}")
         return valid_roots
-
+    def get_affixes(self):
+        return self.affixes
+    def get_roots(self):
+        return self.words   
     def morphological_analysis(self, word):
         word = word.lower()
-        print(f"word:{word}")
+        # if word.isdigit():
+        #     return True
+        # print(f"word:{word}")
         if word in self.ignored_words:
-            # print(f"Word {word} is ignored")
-            return [word], []  # If the word is ignored, it's considered valid
+            return {word: []}, {}  # Change the output structure to use lists instead of sets
 
-        roots = []
-        affixes = []
-
+        morphological_dict = {}
         for affix_class, rules in self.affixes.items():
-
             for rule in rules:
-
-                if word.endswith(rule['affix']) and rule['flag'] in verbClasses:
-
-                    if rule['stripping'] != '0':
-                        stripped_letter = rule['stripping']
-                        root = word[:len(word) - len(rule['affix'])
-                                    ] + stripped_letter
-                        roots.append(root)
-                        affixes.append(rule['affix'])
-                    else:
-                        root = word[:len(word) - len(rule['affix'])]
-                    roots.append(root)
-                    affixes.append(rule['affix'])
-                    # print(f"rule of condtion:{rule['condition']}")
-
-                elif word.endswith(rule['affix']) and rule['flag'] in nounClasses:
+               if word.endswith(rule.get('affix')) and rule['flag'] in nounClasses:
                     if rule['stripping'] != '0':
                         stripped_letter = rule['stripping']
                         root = word[:len(word) - len(rule['affix'])
                                     ] + stripped_letter
                         # print(f"rootsss:{root}")
-                        roots.append(root)
-                        affixes.append(rule['affix'])
-                    else:
-                        root = word[:len(word) - len(rule['affix'])]
-
-                    roots.append(root)
-                    affixes.append(rule['affix'])
+                        morphological_dict[root] = set()
+                        morphological_dict[root].add(rule['affix'])
+                        for root, affixes in morphological_dict.items():
+                            morphological_dict[root] = list(affixes)
 
         for affix_class, rules in self.affixes.items():
             for rule in rules:
-                if word.startswith(rule['affix']) and rule['option_name'] == 'PFX':
-                    if rule['stripping'] != '0':
-                        stripped_letter = rule['stripping']
-                        root = word[len(rule['affix']):]
+                if word.endswith(rule.get('affix')):
+                    root = word[:len(word) - len(rule['affix'])]
+                    if root not in morphological_dict:
+                        morphological_dict[root] = set()
+                    morphological_dict[root].add(rule['affix'])
+                else:
+                    continue  # Go to the next rule if no affix is found
 
-                    else:
-                        root = word[len(rule['affix']):]
+        # If no affix is found, add roots directly from self.words
+        for root in self.words.keys():
+            if word.startswith(root):
+                affix = word[len(root)-len(word):]
+                # if root not in morphological_dict:
+                morphological_dict[root] = set()
+                morphological_dict[root].add(affix)
 
-                    roots.append(root)
-                    affixes.append(rule['affix'])
+        # Convert sets to lists
+        for root, affixes in morphological_dict.items():
+            morphological_dict[root] = list(affixes)
+            # For striping Noun classes 
 
-        valid_roots = []
-        valid_affixes = []
+            # else:
+                
+            #     root = word[:len(word) - len(rule['affix'])]
 
-        for root, affix in zip(roots, affixes):
-            if self.is_valid_word(root) and affix in self.get_affixes_for_root(root):
-                valid_roots.append(root)
-                valid_affixes.append(affix)
+            # roots.append(root)
+            # affixes.append(rule['affix'])
+        print("morphological dictionary:", morphological_dict)
+        return morphological_dict, {}  # Return empty dict for affixes
 
-        print(f"Valid roots and affixes for {
-              word}: {valid_roots}, {valid_affixes}")
-        return valid_roots, valid_affixes
+    # def morphological_analysis(self, word):
+    #     word = word.lower()
+    #     print(f"word:{word}")
+    #     if word in self.ignored_words:
+    #     # print(f"Word {word} is ignored")
+    #         return {word}, set()  # Change lists to sets
+
+    #     roots = set()
+    #     affixes = set()
+    #     for affix_class, rules in self.words.items():
+    #         for rule in rules:
+    #             if word.endswith(rule['affix']):
+    #                 root = word[:len(word) - len(rule['affix'])]
+    #                 roots.add(root)
+    #                 affixes.add(rule['affix'])
+
+    #     print("roots:", roots, "affixes:", affixes)
+        # for affix_class, rules in self.affixes.items():
+
+        #     for rule in rules:
+
+        #         if word.endswith(rule['affix']) and rule['flag'] in verbClasses:
+
+        #             if rule['stripping'] != '0':
+        #                 stripped_letter = rule['stripping']
+        #                 root = word[:len(word) - len(rule['affix'])
+        #                             ] + stripped_letter
+        #                 roots.append(root)
+        #                 affixes.append(rule['affix'])
+        #             else:
+        #                 root = word[:len(word) - len(rule['affix'])]
+        #             roots.append(root)
+        #             affixes.append(rule['affix'])
+        #             # print(f"rule of condtion:{rule['condition']}")
+
+        #         elif word.endswith(rule['affix']) and rule['flag'] in nounClasses:
+        #             if rule['stripping'] != '0':
+        #                 stripped_letter = rule['stripping']
+        #                 root = word[:len(word) - len(rule['affix'])
+        #                             ] + stripped_letter
+        #                 # print(f"rootsss:{root}")
+        #                 roots.append(root)
+        #                 affixes.append(rule['affix'])
+        #             else:
+        #                 root = word[:len(word) - len(rule['affix'])]
+
+        #             roots.append(root)
+        #             affixes.append(rule['affix'])
+        #     # print("roots: ", roots, "affixes: ", affixes, "classes: ", rule['flags'])
+        # for affix_class, rules in self.affixes.items():
+        #     for rule in rules:
+        #         if word.startswith(rule['affix']) and rule['option_name'] == 'PFX':
+        #             if rule['stripping'] != '0':
+        #                 stripped_letter = rule['stripping']
+        #                 root = word[len(rule['affix']):]
+
+        #             else:
+        #                 root = word[len(rule['affix']):]
+
+        #             roots.append(root)
+        #             affixes.append(rule['affix'])
+
+        # valid_roots = []
+        # valid_affixes = []
+
+        # for root, affix in zip(roots, affixes):
+        #     if self.is_valid_word(root) and affix in self.get_affixes_for_root(root):
+        #         valid_roots.append(root)
+        #         valid_affixes.append(affix)
+        # # print("valid_roots: ", valid_affixes, "valid_affixes", valid_affixes)
+        # return valid_roots, valid_affixes
 
     def get_affix_class_for_root(self, word):
         affix_class = None

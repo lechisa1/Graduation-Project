@@ -823,23 +823,23 @@ SFX V4 Y 83
 SFX V4 t nna t
 SFX V4 t nne t
 SFX V4 t nnu t
-SFX V4 0 dha t
-SFX V4 0 dhe t
-SFX V4 0 dhu t
-SFX V4 0 chisiise t
-SFX V4 0 chisiisa t
-SFX V4 0 chisisa t
-SFX V4 0 chisiisan t
-SFX V4 0 chisiste t
-SFX V4 0 chisisna t
-SFX V4 0 chisistan t
-SFX V4 0 chiise t
-SFX V4 0 chiisan t
-SFX V4 0 chiisna t
-SFX V4 0 chiistan t
-SFX V4 0 chiisne t
-SFX V4 0 iinsa t
-SFX V4 0 iisa t
+SFX V4 t dha t
+SFX V4 t dhe t
+SFX V4 t dhu t
+SFX V4 t chisiise t
+SFX V4 t chisiisa t
+SFX V4 t chisisa t
+SFX V4 t chisiisan t
+SFX V4 t chisiste t
+SFX V4 t chisisna t
+SFX V4 t chisistan t
+SFX V4 t chiise t
+SFX V4 t chiisan t
+SFX V4 t chiisna t
+SFX V4 t chiistan t
+SFX V4 t chiisne t
+SFX V4 t iinsa t
+SFX V4 t iisa t
 SFX V4 t nnoo t
 SFX V4 0 ta t
 SFX V4 0 tani t
@@ -850,7 +850,8 @@ SFX V4 0 ti t
 SFX V4 0 tu t
 SFX V4 0 tuu t
 SFX V4 0 a t
-SFX V4 0 achuu t
+SFX V4 0 achuu 
+SFX V4 t chuu t
 SFX V4 0 achuuf t
 SFX V4 0 adha t
 SFX V4 0 adhe t
@@ -1696,7 +1697,9 @@ SFX N2 0 a [aeiou'][aeiou]ra
 SFX N2 0 rraa [aeiou'][aeiou]ra 
 SFX N2 a man [aeiou'][aeiou]ma 
 SFX N2 a mi [aeiou'][aeiou]ma 
+SFX N2 a ni [aeiou'][aeiou]ma
 SFX N2 a ota [aeiou'][aeiou][lmr]a 
+SFX N2 a oota [aeiou'][aeiou][lmr]a 
 SFX N2 a olee [aeiou'][aeiou][lmr]a 
 SFX N2 a olii [aeiou'][aeiou][lmr]a
 
@@ -1723,6 +1726,7 @@ SFX N3 a ni [^aeiou][aeiou][kgdrbn]a
 SFX N3 0 a [^aeiou][aeiou][kgdrbn]a 
 
 SFX N4 Y 26 
+SFX N4 eessa eeyyii eessa 
 SFX N4 a i eecha 
 SFX N4 0 tti eecha 
 SFX N4 0 rraa eecha 
@@ -1744,7 +1748,7 @@ SFX N4 0 rraa essa
 SFX N4 eecha eeyyii eecha 
 SFX N4 eenii eeyyii eettii 
 SFX N4 eettii eeyyii eettii 
-SFX N4 eessa eeyyii eessa 
+
 SFX N4 eeysa eeyyii eeysa 
 SFX N4 eeytii eeyyii eeytii 
 SFX N4 essa eeyyii essa 

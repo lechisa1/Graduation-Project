@@ -2,12 +2,15 @@ import re
 import Levenshtein
 from app.knowledge_base.knowledge_base import KnowledgeBase
 from app.morphological_analyzer.morphological_analyzer import MorphologicalAnalyzer
+from app.error_detection.error_detection import ErrorDetection
+from app.routes.error_detection_routes import get_error_class
 
 class ErrorCorrection:
     def __init__(self, knowledge_base: KnowledgeBase, morphological_analyzer: MorphologicalAnalyzer, aff_file_path):
         self.knowledge_base = knowledge_base
         self.morphological_analyzer = morphological_analyzer
         self.replacement_rules = self.load_replacement_rules(aff_file_path)
+        
 
     def load_replacement_rules(self, aff_file_path):
         replacement_rules = {}
@@ -19,10 +22,17 @@ class ErrorCorrection:
         return replacement_rules
 
     def apply_replacement_rules(self, error):
-        for rule, replacement in self.replacement_rules.items():
-            error = error.replace(rule, replacement)
-        return error
-
+        if isinstance(error, dict):
+            corrected_error = {k: self.apply_replacement_rules(v) for k, v in error.items()}
+        elif isinstance(error, str):
+            for rule, replacement in self.replacement_rules.items():
+                error = error.replace(rule, replacement)
+            corrected_error = error
+        else:
+            raise ValueError("Expected a string or dict for argument 'error'")
+        return corrected_error
+    def correct_by_levensthein(self):
+        get_error_class()
     def custom_levenshtein(self, s1, s2):
         # Initialize substitution, insertion, and deletion costs
         substitution_cost = 1

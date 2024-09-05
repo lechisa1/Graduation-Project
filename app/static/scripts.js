@@ -5,7 +5,7 @@ async function tokenizeText() {
     var inputText = document.getElementById("inputText");
     caretPosition = getCaretPosition(inputText);
     var text = inputText.textContent;
-
+    //text = text.toLowerCase();
     // Send the input text to the server for tokenization
     const tokenizeResponse = await fetch("/tokenize", {
       method: "POST",
@@ -30,24 +30,30 @@ async function tokenizeText() {
       }),
     });
     const detectErrorsData = await detectErrorsResponse.json();
-    console.log("Detected Errors:", detectErrorsData.errors);
+    console.log("Errors:", detectErrorsData.errors);
+    console.log("error_classes:", detectErrorsData.error_classes);
 
     // Correct errors and generate suggestions for each error
-    let corrections = [];
     let allSuggestions = {};
-    for (let error of detectErrorsData.errors) {
+
+    // Assuming detectErrorsData.errors is an object with error codes as keys
+    for (let error_class of Object.keys(detectErrorsData.error_classes)) {
+      const errorDetails = detectErrorsData.error_classes[error_class]; // Assuming errorDetails is the dictionary containing error details
+
+      // Assuming errorDetails is a dictionary containing additional error information
       const correctErrorsResponse = await fetch("/correct_errors", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          errors: [error],
+          error_class: error_class,
+          details: errorDetails // Sending error details along with error code
         }),
       });
+
       const correctErrorsData = await correctErrorsResponse.json();
       console.log("Returned Corrections:", correctErrorsData.corrections);
-      corrections.push(...correctErrorsData.corrections);
 
       // Generate words
       const generateWordsResponse = await fetch("/generate_words", {
@@ -57,16 +63,16 @@ async function tokenizeText() {
         },
         body: JSON.stringify({
           morphemes: correctErrorsData.corrections,
-          errors:detectErrorsData.errors
+          error_class: error_class,
+
         }),
       });
       const generateWordsData = await generateWordsResponse.json();
       console.log("Generated Words:", generateWordsData.words);
-      allSuggestions[error] = generateWordsData.words;
+      allSuggestions[error_class] = generateWordsData.words;
     }
 
     // Apply styling with ranked suggestions
-
     applyErrorStyling(detectErrorsData.errors, allSuggestions);
 
     // Handle the server response for ranked suggestions if needed
@@ -78,22 +84,21 @@ async function tokenizeText() {
 
 function applyErrorStyling(errors, suggestions) {
   var inputTextContainer = document.getElementById("inputText");
-  // Modify the pattern to capture spaces
   var pattern = /(\b[\w\'-]+(?:[.,;:!?\"'])?\b|\d+|[.,;:!?()\"'\s])/g;
-
+  //inputTextContainer =  inputTextContainer.toLowerCase();
   var words = inputTextContainer.textContent.match(pattern);
-
+  //words = words.toLowerCase();
   inputTextContainer.innerHTML = "";
 
   words.forEach((word) => {
     var span = document.createElement("span");
     span.textContent = word;
-    if (word.trim() && errors.includes(word.trim())) {
+    var trimmedWord = word.trim().toLowerCase();
+    if (errors.hasOwnProperty(trimmedWord) && errors[trimmedWord] === false) {
       span.classList.add("misspelled");
       span.onclick = function () {
-        // Find the suggestions for this specific word
-        var wordSuggestions = suggestions[word.trim()];
-        displaySuggestions(wordSuggestions, word.trim(), span);
+        var wordSuggestions = suggestions[trimmedWord];
+        displaySuggestions(wordSuggestions, trimmedWord, span);
       };
     }
     inputTextContainer.appendChild(span);
@@ -105,9 +110,9 @@ function applyErrorStyling(errors, suggestions) {
 function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
   var suggestionsContainer = document.getElementById("suggestions");
   suggestionsContainer.innerHTML = ""; // Clear previous suggestions
- 
+
   // Limit the number of suggestions
-  var maxSuggestions = 3;
+  var maxSuggestions = 15;
   suggestions = suggestions.slice(0, maxSuggestions);
 
   suggestions.forEach((suggestion) => {
@@ -170,7 +175,7 @@ function displaySuggestions(suggestions, misspelledWord, misspelledSpan) {
       .then((response) => response.json())
       .then((data) => {
         console.log(
-          "Added error word to custome dictionary words:",
+          "Added error word to custom dictionary words:",
           data.message
         );
       });
@@ -294,3 +299,36 @@ document.addEventListener("click", function (event) {
     suggestionsContainer.style.display = "none";
   }
 });
+
+
+//theming
+document.addEventListener('DOMContentLoaded', function() {
+  const themeToggleCheckbox = document.getElementById('theme-toggle-checkbox');
+
+  themeToggleCheckbox.addEventListener('change', function() {
+      document.body.classList.toggle('dark-theme');
+      document.getElementById('body').classList.toggle('dark-theme');
+  });
+});
+
+
+
+function updateYear() {
+  var currentYear = new Date().getFullYear();
+  document.getElementById("currentYear").textContent = currentYear;
+}
+
+// Call the function initially to display the current year
+updateYear();
+function handlePlaceholder() {
+  var inputTextContainer = document.getElementById("inputText");
+  var placeholder = inputTextContainer.getAttribute("data-text");
+  
+  // Check if the text area is empty
+  if (!inputTextContainer.textContent.trim()) {
+    inputTextContainer.textContent = placeholder;
+  }
+}
+
+// Call the function initially to set the placeholder text
+handlePlaceholder();

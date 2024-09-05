@@ -11,14 +11,34 @@ def detect_errors():
     tokens = data.get('tokens', [])
     
     kb = KnowledgeBase('app/knowledge_base/resources/dictionary.dic', 'app/knowledge_base/resources/dictionary.aff')
-
     ma = MorphologicalAnalyzer(kb)
     error_detection = ErrorDetection(kb, ma)
-
-    errors = []
+    
+    errors = {}
+    error_classes = {}
     for token in tokens:
-        if not error_detection.is_valid_word(token):
-            errors.append(token)
-            
+        is_error, error_class = error_detection.is_valid_word(token)
+        errors[token] = is_error
+        if not is_error: 
+            error_classes[token] = error_class
+    print("error_classes:",error_classes)
+    return jsonify({'errors': errors, "error_classes": error_classes})
+def get_error_class():
+    data = request.get_json()
+    tokens = data.get('tokens', [])
+    
+    kb = KnowledgeBase('app/knowledge_base/resources/dictionary.dic', 'app/knowledge_base/resources/dictionary.aff')
+    ma = MorphologicalAnalyzer(kb)
+    error_detection = ErrorDetection(kb, ma)
+    errors = {}
+    for token in tokens:
+        is_error, error_class = error_detection.is_valid_word(token)
+        if not is_error:
+            errors[token] = is_error
 
-    return jsonify({'errors': errors})
+    print("List of Errors to be corrected:",errors)
+    return  errors 
+
+
+
+   
